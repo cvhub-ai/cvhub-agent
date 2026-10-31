@@ -19,11 +19,11 @@
 
 ### 当前优先 — DeepSeek API
 - [x] 注册 DeepSeek 账户，并在 `.env` 中配置 API Key
-- [ ] 复用统一 LLM Client，接入 DeepSeek OpenAI-compatible API 并验证基本 Chat
-- [ ] 配置 Model、Temperature、Max Tokens、Timeout、Retry 等参数
-- [ ] 验证 Tool Calling、Structured Output 和 Streaming
-- [ ] 测试 API 超时、调用失败、限流及错误反馈
-- [ ] 记录 Token Usage 与 API 调用成本
+- [x] 复用统一 LLM Client，接入 DeepSeek OpenAI-compatible API 并验证基本 Chat
+- [x] 配置 Model、Temperature、Max Tokens、Timeout、Retry 等参数
+- [x] 验证 Tool Calling、Structured Output 和 Streaming
+- [x] 测试 API 超时、调用失败、限流及错误反馈
+- [x] 记录 Token Usage 与 API 调用成本
 
 ### 暂缓 — 本地 vLLM / Qwen（保留原任务）
 - [x] ~~配置并启动现有 vLLM + Qwen 推理服务~~

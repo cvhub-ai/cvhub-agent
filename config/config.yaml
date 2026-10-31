@@ -1,9 +1,25 @@
-llm:
-  temperature: 0.1
-  max_output_tokens: 512
-  context_length: 4096
 
+llm:
+  # Active model provider: deepseek / local
+  provider: deepseek
+
+  # Provider configurations
+  providers:
+    deepseek:
+      base_url: https://api.deepseek.com
+      model: deepseek-flash
+
+    local:
+      base_url: http://localhost:8000/v1
+      model: qwen3.5-9b
+
+  # Generation settings
+  temperature: 0.1
+  max_output_tokens: 4096
+
+  # Request settings
   timeout_seconds: 120
   max_retries: 1
 
+  # Model-specific feature
   enable_thinking: false

@@ -26,3 +26,8 @@ dev = [
     "pytest-mock>=3.17.0",
     "ruff>=0.17.1",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
