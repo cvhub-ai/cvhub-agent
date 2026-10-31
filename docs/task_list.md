@@ -1,0 +1,99 @@
+## Phase 1 — Project Setup & Architecture
+- [x] 创建 cvhub-agent Repository，使用 uv 管理 Python 环境和依赖
+- [x] 确定 LangChain、LangGraph、FastAPI、MCP SDK 等技术栈及版本
+- [x] 设计项目结构及 Agent、Workflow、Tools、MCP、Clients 的边界
+- [x] 实现 Configuration Management（.env、Pydantic Settings、Secrets）
+- [x] 配置 Ruff、pytest、Git 和基础 CI
+
+阶段成果：可维护、可测试的 Agent 项目基础结构
+
+## Phase 2 — LLM Serving & Integration
+- [x] 配置并启动现有 vLLM + Qwen 推理服务
+- [ ] 实现统一的 LLM Client，支持 OpenAI-compatible API
+- [ ] 实现 Model、Temperature、Context Length、Timeout 等配置
+- [ ] 验证 Chat、Tool Calling、Structured Output 的兼容性
+- [ ] 设计基础推理 Benchmark，记录 Latency、Throughput、显存占用
+- [ ] 测试模型服务不可用及请求超时的处理
+
+阶段成果：经过兼容性验证的独立 LLM 推理服务
+
+## Phase 3 — LangChain Core Agent
+- [ ] 使用 LangChain create_agent() 创建 Agent
+- [ ] 定义 System Prompt、Agent 配置及调用入口
+- [ ] 使用 @tool 实现 LangChain Native Tools
+- [ ] 测试 Tool Schema、Tool Calling、工具结果反馈
+- [ ] 测试 Multi-step Tool Calling、Structured Output 和执行限制
+- [ ] 编写 Agent Unit Tests，Mock 外部模型与工具
+
+阶段成果：能够调用 Native Tools 的基础 Agent
+
+## Phase 4 — MCP Integration
+- [ ] 学习 MCP 基础架构、Tools、Resources、Prompts 和 Transport 的职责
+- [ ] 使用 MCP Python SDK 实现独立 MCP Server
+- [ ] 通过 Streamable HTTP 暴露两个实际可调用的 MCP Tools
+- [ ] 集成 LangChain MCP Client Adapter，完成 Tool Discovery 与调用
+- [ ] 实现 MCP Tools 与 Native Tools 的统一加载
+- [ ] 测试 MCP 参数验证、网络断连、Timeout 和错误处理
+- [ ] 验证 MCP Server 独立进程及 Docker 网络通信
+
+阶段成果：完整的 MCP Server → MCP Client → Agent 工具调用链路
+
+## Phase 5 — External Services & RAG
+- [ ] 开发 RAG Client，调用 CVHub RAG 检索接口
+- [ ] 通过 MCP Server 暴露 RAG Search Tool
+- [ ] 开发 OCR gRPC Client，并封装 OCR Tool
+- [ ] 设计工具输入输出 Schema，包括文档标识、结果及引用来源
+- [ ] 验证 Agent 能选择工具、组合调用并处理真实结果
+- [ ] 处理外部服务失败、无检索结果、数据过长等情况
+
+阶段成果：Agent 与已有 RAG、OCR 微服务协同工作
+
+## Phase 6 — Workflow & Orchestration
+- [ ] 学习 LangGraph StateGraph、Nodes、Edges 和 State
+- [ ] 实现固定步骤的 Deterministic Workflow
+- [ ] 添加 Conditional Routing、Retry、Failure Handling
+- [ ] 在 Workflow 节点中调用已有 LangChain Agent
+- [ ] 实现一个 Hybrid Workflow（固定步骤 + Agent 动态决策）
+- [ ] 编写 Workflow 测试，验证执行顺序、状态及错误路径
+
+阶段成果：Dynamic Agent、Deterministic Workflow、Hybrid Workflow 三种模式
+
+## Phase 7 — Memory & Context Engineering
+- [ ] 通过 LangGraph Checkpointer 实现 Short-term Memory
+- [ ] 使用 thread_id 实现会话隔离和恢复
+- [ ] 使用 PostgreSQL Checkpointer 实现跨进程持久化
+- [ ] 实现 Conversation History 管理及 Context Trimming / Summarization
+- [ ] 管理 System Prompt、RAG Context、Tool Results 的输入内容
+- [ ] 测试长对话、Context 超限和不同会话的状态隔离
+
+阶段成果：具备多轮对话、状态恢复和上下文控制的 Agent
+
+## Phase 8 — Backend API & Security
+- [ ] 使用 FastAPI 实现 Chat API、Streaming API 和 Health Check
+- [ ] 通过 Pydantic 定义并验证 Request / Response Schema
+- [ ] 实现必要的 API Authentication、配置及密钥管理
+- [ ] 为 Tools 添加 Allowlist、参数限制和操作权限
+- [ ] 处理 Prompt Injection 风险，区分不可信内容与系统指令
+- [ ] 添加 Timeout、Rate Limiting、Error Handling 和 Request ID
+
+阶段成果：能够被客户端安全访问的 Agent Backend
+
+## Phase 9 — Evaluation & Observability
+- [ ] 建立 Agent Evaluation Dataset，包含正常及异常任务
+- [ ] 评估 Tool Selection、Tool Arguments、Task Success Rate
+- [ ] 对 Workflow 和 RAG 结果进行端到端回归测试
+- [ ] 集成 Langfuse 或 LangSmith，记录 Agent Execution Traces
+- [ ] 记录 Latency、Token Usage、LLM / Tool 错误及必要的成本指标
+- [ ] 建立 Unit、Integration、E2E Tests，并接入 GitHub Actions CI
+
+阶段成果：具有可重复评估、追踪及回归测试能力的系统
+
+## Phase 10 — Docker & Cloud Deployment
+- [ ] 为 Agent Backend 和 MCP Server 创建 Dockerfile
+- [ ] 编写 Docker Compose，配置容器网络、环境变量和 Health Check
+- [ ] 集成现有 vLLM、RAG、OCR 服务的连接配置
+- [ ] 完成容器环境中的 End-to-End Tests
+- [ ] 选择 Azure 或 AWS，实践一次 Agent API + MCP 服务部署
+- [ ] 编写 Architecture、Deployment、Testing 和 API Documentation
+
+阶段成果：能够独立部署、可重复测试的 CVHub Agent 系统
