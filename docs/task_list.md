@@ -51,13 +51,13 @@
 阶段成果：能够调用 Native Tools 的基础 Agent
 
 ## Phase 4 — MCP Integration
-- [ ] 学习 MCP 基础架构、Tools、Resources、Prompts 和 Transport 的职责
-- [ ] 使用 MCP Python SDK 实现独立 MCP Server
-- [ ] 通过 Streamable HTTP 暴露两个实际可调用的 MCP Tools
-- [ ] 集成 LangChain MCP Client Adapter，完成 Tool Discovery 与调用
-- [ ] 实现 MCP Tools 与 Native Tools 的统一加载
-- [ ] 测试 MCP 参数验证、网络断连、Timeout 和错误处理
-- [ ] 验证 MCP Server 独立进程及 Docker 网络通信
+- [x] 学习 MCP 基础架构、Tools、Resources、Prompts 和 Transport 的职责
+- [x] 使用 MCP Python SDK 实现独立 MCP Server
+- [x] 通过 Streamable HTTP 暴露两个实际可调用的 MCP Tools
+- [x] 集成 LangChain MCP Client Adapter，完成 Tool Discovery 与调用
+- [x] 实现 MCP Tools 与 Native Tools 的统一加载
+- [x] 测试 MCP 参数验证、网络断连、Timeout 和错误处理
+- [x] 验证 MCP Server 独立进程及 Docker 网络通信
 
 阶段成果：完整的 MCP Server → MCP Client → Agent 工具调用链路
 
