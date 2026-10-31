@@ -40,13 +40,13 @@
 阶段成果：DeepSeek API 能提供基本对话和 Agent Tool Calling；本地模型接入留待后续。
 
 ## Phase 3 — LangChain Core Agent
-- [ ] 使用 LangChain create_agent() 创建 Agent Factory（模型实例由外部注入，不绑定 DeepSeek 或 vLLM）
-- [ ] 定义 System Prompt、Agent 配置及调用入口
-- [ ] 使用 @tool 实现 LangChain Native Tools
-- [ ] 测试 Tool Schema、Tool Calling、工具结果反馈
-- [ ] 测试 Multi-step Tool Calling、Structured Output，并设置 Model / Tool Call 次数上限及停止条件
-- [ ] 编写 Agent Unit Tests，Mock 外部模型与工具
-- [ ] 完成最小运行验证：用户请求 → Agent → Native Tool → 最终回答
+- [x] 使用 LangChain create_agent() 创建 Agent Factory（模型实例由外部注入，不绑定 DeepSeek 或 vLLM）
+- [x] 定义 System Prompt、Agent 配置及调用入口
+- [x] 使用 @tool 实现 LangChain Native Tools
+- [x] 测试 Tool Schema、Tool Calling、工具结果反馈
+- [x] 测试 Multi-step Tool Calling、Structured Output，并设置 Model / Tool Call 次数上限及停止条件
+- [x] 编写 Agent Unit Tests，Mock 外部模型与工具
+- [x] 完成最小运行验证：用户请求 → Agent → Native Tool → 最终回答
 
 阶段成果：能够调用 Native Tools 的基础 Agent
 
@@ -123,3 +123,5 @@
 - [ ] 编写 Architecture、Deployment、Testing 和 API Documentation
 
 阶段成果：能够独立部署、可重复测试的 CVHub Agent 系统
+
+
