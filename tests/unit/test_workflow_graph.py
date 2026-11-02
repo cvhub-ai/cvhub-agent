@@ -1,5 +1,7 @@
 import pytest
+from langchain_core.runnables import RunnableConfig
 
+from cvhub_agent.persistence.checkpointer import open_checkpointer
 from cvhub_agent.workflows.state import (
     ReviewResult,
     StepResult,
@@ -521,3 +523,91 @@ def test_task_workflow_negative_retries():
             ),  # type: ignore
             max_step_retries=-1,
         )
+
+
+# ============================================================
+# Workflow Checkpoint Persistence
+# ============================================================
+
+
+@pytest.mark.asyncio
+async def test_task_workflow_inmemory_checkpoint():
+    executor = FakeExecutor()
+    reviewer = FakeReviewer(
+        approved=True,
+        feedback="Approved",
+    )
+
+    thread_id = "test-workflow-checkpoint"
+
+    thread_config: RunnableConfig = {
+        "configurable": {
+            "thread_id": thread_id,
+        }
+    }
+
+    async with open_checkpointer("memory") as checkpointer:
+        workflow = TaskWorkflow(
+            planner=FakePlanner(),  # type: ignore
+            executor=executor,  # type: ignore
+            reviewer=reviewer,  # type: ignore
+            checkpointer=checkpointer,
+        )
+
+        # Execute workflow
+        result = await workflow.run(
+            WorkflowState(goal="Calculate 125 + 375 and explain the result."),
+            thread_id=thread_id,
+        )
+
+        assert result.status == "completed"
+        assert result.step_index == 2
+        assert len(result.results) == 2
+
+        # Read the latest persisted checkpoint
+        snapshot = await workflow._graph.aget_state(thread_config)
+
+        assert snapshot.values["status"] == "completed"
+        assert snapshot.values["goal"] == result.goal
+        assert snapshot.values["plan"] == result.plan
+        assert snapshot.values["step_index"] == 2
+        assert len(snapshot.values["results"]) == 2
+        assert snapshot.next == ()
+
+        # Read checkpoint history
+        history = [
+            item async for item in workflow._graph.aget_state_history(thread_config)
+        ]
+
+        assert len(history) > 1
+
+        # Verify an intermediate execution state was persisted
+        assert any(
+            item.values.get("step_index") == 1
+            and len(item.values.get("results", [])) == 1
+            for item in history
+        )
+
+        # Verify execution order
+        assert executor.received_indices == [0, 1]
+        assert reviewer.calls == 1
+
+
+@pytest.mark.asyncio
+async def test_task_workflow_checkpointer_requires_thread_id():
+    async with open_checkpointer("memory") as checkpointer:
+        workflow = TaskWorkflow(
+            planner=FakePlanner(),  # type: ignore
+            executor=FakeExecutor(),  # type: ignore
+            reviewer=FakeReviewer(
+                approved=True,
+                feedback="Approved",
+            ),  # type: ignore
+            checkpointer=checkpointer,
+        )
+
+        with pytest.raises(
+            ValueError,
+            match="thread_id is required",
+        ):
+            await workflow.run(WorkflowState(goal="Test missing thread ID"))

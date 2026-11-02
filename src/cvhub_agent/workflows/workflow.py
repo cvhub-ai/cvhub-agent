@@ -1,6 +1,8 @@
 import logging
 from typing import Literal
 
+from langchain_core.runnables import RunnableConfig
+from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, StateGraph
 
 from cvhub_agent.workflows.executor import ExecutorNode
@@ -14,11 +16,12 @@ logger = logging.getLogger(__name__)
 class TaskWorkflow:
     def __init__(
         self,
+        *,
         planner: PlannerNode,
         executor: ExecutorNode,
         reviewer: ReviewerNode,
-        *,
         max_step_retries: int = 0,
+        checkpointer: BaseCheckpointSaver | None = None,
     ) -> None:
         if max_step_retries < 0:
             raise ValueError("max_step_retries must not be negative.")
@@ -26,6 +29,7 @@ class TaskWorkflow:
         self._executor = executor
         self._reviewer = reviewer
         self._max_step_retries = max_step_retries
+        self._checkpointer = checkpointer
 
         self._graph = self._build_graph()
 
@@ -74,7 +78,7 @@ class TaskWorkflow:
         builder.add_edge("finish", END)
         builder.add_edge("reject", END)
 
-        return builder.compile()
+        return builder.compile(checkpointer=self._checkpointer)
 
     async def _run_planner(self, state: WorkflowState) -> dict:
         try:
@@ -241,19 +245,83 @@ class TaskWorkflow:
 
         return {"status": "failed", "error": state.review.feedback}
 
-    async def run(
+    def _build_run_config(
         self,
-        state: WorkflowState,
-    ) -> WorkflowState:
-        # Include enough graph steps for configured retries.
+        thread_id: str | None,
+    ) -> RunnableConfig:
         recursion_limit = max(
             30,
             5 * (self._max_step_retries + 1) + 10,
         )
 
+        config: RunnableConfig = {
+            "recursion_limit": recursion_limit,
+        }
+
+        if self._checkpointer is not None:
+            if not thread_id:
+                raise ValueError(
+                    "thread_id is required when a checkpointer is enabled."
+                )
+
+            config["configurable"] = {
+                "thread_id": thread_id,
+            }
+
+        return config
+
+    async def run(
+        self,
+        state: WorkflowState,
+        *,
+        thread_id: str | None = None,
+        pause_after_executor: bool = False,
+    ) -> WorkflowState:
+        if pause_after_executor and self._checkpointer is None:
+            raise ValueError("A checkpointer is required to pause a workflow.")
+
+        config = self._build_run_config(thread_id)
+
+        if self._checkpointer is not None:
+            snapshot = await self._graph.aget_state(config)
+
+            if snapshot.values or snapshot.next:
+                raise ValueError(
+                    "This thread already has a workflow. "
+                    "Use a new thread_id or resume()."
+                )
+
         result = await self._graph.ainvoke(
             state,
-            config={"recursion_limit": recursion_limit},
+            config=config,
+            interrupt_after=(["executor"] if pause_after_executor else None),
+        )
+
+        return WorkflowState(**result)
+
+    async def resume(
+        self,
+        *,
+        thread_id: str,
+    ) -> WorkflowState:
+        if self._checkpointer is None:
+            raise ValueError("Cannot resume a workflow without a checkpointer.")
+
+        config = self._build_run_config(thread_id)
+
+        snapshot = await self._graph.aget_state(config)
+
+        if not snapshot.values:
+            raise ValueError(f"No checkpoint found for thread: {thread_id}")
+
+        if not snapshot.next:
+            raise ValueError(
+                "Workflow has already finished. There are no pending nodes to resume."
+            )
+
+        result = await self._graph.ainvoke(
+            None,
+            config=config,
         )
 
         return WorkflowState(**result)

@@ -1,0 +1,37 @@
+
+name: cvhub-agent
+
+services:
+  db:
+    image: postgres:17
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: ${AGENT_DB_NAME:-cvhub_agent}
+      POSTGRES_USER: ${AGENT_DB_USER:-cvhub_agent}
+      POSTGRES_PASSWORD: ${AGENT_DB_PASSWORD:?Database password is required}
+
+    ports:
+      - "127.0.0.1:${AGENT_DB_PORT:-18010}:5432"
+
+    volumes:
+      - agent_postgres_data:/var/lib/postgresql/data
+
+    networks:
+      - agent_network
+
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
+volumes:
+  agent_postgres_data:
+
+networks:
+  agent_network:
+    driver: bridge

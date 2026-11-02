@@ -86,14 +86,17 @@
 阶段成果： 支持 Direct Agent、Dynamic Plan Workflow、Predefined Plan Workflow 三种任务执行模式，并通过 Hybrid Workflow 结合确定性流程控制与 Agent 自主决策。
 
 ## Phase 7 — Memory & Context Engineering
-- [ ] 通过 LangGraph Checkpointer 实现 Short-term Memory（可在 Phase 3 后先用 InMemorySaver 验证多轮会话）
-- [ ] 使用 thread_id 实现会话隔离和恢复
-- [ ] 使用 PostgreSQL Checkpointer 实现跨进程持久化
-- [ ] 实现 Conversation History 管理及 Context Trimming / Summarization
-- [ ] 管理 System Prompt、RAG Context、Tool Results 的输入内容
-- [ ] 测试长对话、Context 超限和不同会话的状态隔离
 
-阶段成果：具备多轮对话、状态恢复和上下文控制的 Agent
+- [x] 明确 Agent Conversation State 与 TaskWorkflow Execution State 的职责和生命周期
+- [x] 使用 LangGraph `InMemorySaver` 为 LangChain Agent 实现 Short-term Memory，支持多轮对话
+- [x] 使用 `thread_id` 管理会话隔离、上下文继承和状态恢复
+- [x] 为 `TaskWorkflow` 集成 Checkpointer，保存和恢复 Plan、Step Index、Results 等执行状态
+- [x] 使用 PostgreSQL `AsyncPostgresSaver` 实现跨进程、重启后的状态持久化
+- [ ] 实现 Conversation History 管理，包括历史消息保留、Trimming 和 Summarization
+- [ ] 统一管理 System Prompt、Conversation History、Workflow Results、RAG Context 和 Tool Results，设计 Context Budget 与输入优先级
+- [ ] 编写 Unit Tests 和 Integration Tests，验证多轮对话、会话隔离、Workflow 恢复、长上下文和 Context 超限处理
+
+**阶段成果：** 具备多轮对话记忆、持久化状态恢复和上下文控制能力的 Agent，支持 Direct Agent 与 TaskWorkflow 两种执行场景。
 
 ## Phase 8 — Backend API & Security
 
