@@ -72,14 +72,18 @@
 阶段成果：Agent 与已有 RAG、OCR 微服务协同工作
 
 ## Phase 6 — Workflow & Orchestration
-- [ ] 学习 LangGraph StateGraph、Nodes、Edges 和 State
-- [ ] 实现固定步骤的 Deterministic Workflow
-- [ ] 添加 Conditional Routing、Retry、Failure Handling
-- [ ] 在 Workflow 节点中调用已有 LangChain Agent
-- [ ] 实现一个 Hybrid Workflow（固定步骤 + Agent 动态决策）
-- [ ] 编写 Workflow 测试，验证执行顺序、状态及错误路径
 
-阶段成果：Dynamic Agent、Deterministic Workflow、Hybrid Workflow 三种模式
+- [x] 学习 LangGraph StateGraph、Nodes、Edges、State 和 Reducer
+- [x] 实现通用 TaskWorkflow（Planner → Executor → Reviewer）
+- [x] 在 Executor Node 中复用现有 LangChain Agent，支持动态 Tool Calling
+- [x] 实现 Conditional Routing、步骤循环、执行完成与审核失败分支
+- [x] 实现基础 Hybrid Workflow（固定编排流程 + LLM 动态规划与决策）
+- [x] 编写 Unit Tests 和 Integration Tests，验证执行顺序、State 更新及基本错误路径
+- [ ] 支持 Dynamic Plan 和 Predefined Plan 两种输入方式，统一使用现有 Executor 和 Reviewer
+- [x] 完善 Workflow 级别的 Retry 和 Failure Handling，包括重试次数、异常处理与失败终止
+- [x] 补充 Predefined Plan、Retry 和 Failure Handling 的相关测试
+
+阶段成果： 支持 Direct Agent、Dynamic Plan Workflow、Predefined Plan Workflow 三种任务执行模式，并通过 Hybrid Workflow 结合确定性流程控制与 Agent 自主决策。
 
 ## Phase 7 — Memory & Context Engineering
 - [ ] 通过 LangGraph Checkpointer 实现 Short-term Memory（可在 Phase 3 后先用 InMemorySaver 验证多轮会话）
